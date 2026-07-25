@@ -23,7 +23,7 @@ format_version = 2
 # one-line change here, and the borrowed graph is never edited in place.
 [[sources]]
 namespace = "asvs"
-url = "https://github.com/timebacksolutions/throughline-asvs"
+url = "https://github.com/rhodium-org/throughline-asvs"
 ref = "v4.0.3"
 
 [grounding]
