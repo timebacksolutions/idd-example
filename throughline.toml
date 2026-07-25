@@ -1,6 +1,6 @@
 [project]
 name = "Council housing resident service (throughline-compose example)"
-format_version = 2
+format_version = 3
 
 # A worked example of a *composed* project. This is an ordinary throughline
 # project — its own product requirements live under intents/, user-requirements/
@@ -77,3 +77,14 @@ rejected    = ["draft", "deleted"]
 # this project's to publish; they are covered by the source's own docs.)
 [docs]
 paths = ["docs/*.md", "README.md"]
+
+# Semantic status roles (SR-0131): which declared status
+# plays each role the tool's operations act on. Backfilled by
+# `tl migrate`; edit to match your own status vocabulary.
+[status.roles]
+initial = "draft"
+proposed = "proposed"
+ratified = "ratified"
+invalidated = "rejected"
+suspect = "suspect"
+tombstone = "deleted"
