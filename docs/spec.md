@@ -3,7 +3,7 @@
 A worked throughline **consumer**: a council-housing self-service account whose own
 requirements are grounded locally and, where they restate a security control, linked
 by `satisfies` to a clause borrowed from the `asvs` source
-([`throughline-asvs@v4.0.3`](https://github.com/timebacksolutions/throughline-asvs)).
+([`throughline-asvs@v4.0.3`](https://github.com/rhodium-org/throughline-asvs)).
 
 The item blocks below are **generated from the graph** by `tl-compose docs`; the
 section headings are the only hand-owned structure. Regenerate with `tl-compose docs`

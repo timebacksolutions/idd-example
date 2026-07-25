@@ -12,7 +12,7 @@ Everything here is read-only — nothing you run changes the repo.
 ## Setup
 
 ```sh
-pip install "throughline-compose @ git+https://github.com/timebacksolutions/throughline-compose@main"
+pip install "throughline-compose @ git+https://github.com/rhodium-org/throughline-compose@main"
 cd idd-example
 ```
 
@@ -21,7 +21,7 @@ That installs two commands: `tl` (throughline core, one graph) and `tl-compose`
 `tl-compose`.
 
 The first `tl-compose` command that composes the source fetches
-[`throughline-asvs@v4.0.3`](https://github.com/timebacksolutions/throughline-asvs) from its git
+[`throughline-asvs@v4.0.3`](https://github.com/rhodium-org/throughline-asvs) from its git
 origin into a per-user cache outside this repo; every run after that is offline.
 
 ---
@@ -45,7 +45,7 @@ tl-compose check --strict
 ```
 
 ```
-tl-compose check · 1 source(s) composed: asvs (https://github.com/timebacksolutions/throughline-asvs@v4.0.3)
+tl-compose check · 1 source(s) composed: asvs (https://github.com/rhodium-org/throughline-asvs@v4.0.3)
 
 0 error(s), 0 warning(s)  — composed graph is sound (strict)
 ```
@@ -171,7 +171,7 @@ Open [`throughline.toml`](throughline.toml) and change one line:
 ```toml
 [[sources]]
 namespace = "asvs"
-url = "https://github.com/timebacksolutions/throughline-asvs"
+url = "https://github.com/rhodium-org/throughline-asvs"
 ref = "v4.0.3"     # ← change this to adopt a newer edition
 ```
 
