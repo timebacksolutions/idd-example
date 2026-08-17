@@ -60,9 +60,24 @@ values = ["proposed", "draft", "deferred", "approved", "ratified", "implemented"
           "verified", "suspect", "rejected", "deleted"]
 
 [transitions]
-proposed    = ["draft", "approved", "ratified", "deferred", "rejected", "deleted"]
-draft       = ["approved", "deferred", "rejected", "deleted"]
-deferred    = ["draft", "approved", "rejected", "deleted"]
+# `tl migrate` added the move to 'suspect' (SR-0188): this lifecycle gave
+# 'proposed' no route to it, so an item resting in 'proposed' could never be
+# marked suspect and invalidating anything it grounds in would have left it
+# unflagged. Narrow it back deliberately with `tl schema transition deny
+# proposed suspect`.
+proposed    = ["draft", "approved", "ratified", "deferred", "rejected", "deleted",
+               "suspect"]
+# `tl migrate` added the move to 'suspect' (SR-0188): this lifecycle gave
+# 'draft' no route to it, so an item resting in 'draft' could never be marked
+# suspect and invalidating anything it grounds in would have left it unflagged.
+# Narrow it back deliberately with `tl schema transition deny draft suspect`.
+draft       = ["approved", "deferred", "rejected", "deleted", "suspect"]
+# `tl migrate` added the move to 'suspect' (SR-0188): this lifecycle gave
+# 'deferred' no route to it, so an item resting in 'deferred' could never be
+# marked suspect and invalidating anything it grounds in would have left it
+# unflagged. Narrow it back deliberately with `tl schema transition deny
+# deferred suspect`.
+deferred    = ["draft", "approved", "rejected", "deleted", "suspect"]
 approved    = ["ratified", "implemented", "deferred", "suspect", "rejected", "deleted"]
 ratified    = ["implemented", "suspect", "rejected", "deleted"]
 implemented = ["verified", "suspect", "rejected", "deleted"]
