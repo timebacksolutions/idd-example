@@ -16,17 +16,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Installs tl-compose and, transitively, throughline (tl) from PyPI, so the
-      # job needs no credentials for the (private) compose tooling repo.
-      - name: Install throughline-compose
-        run: pip install throughline-compose
+      # Installs throughline (tl) from PyPI. 3.11.0 or later composes the declared
+      # sources itself, so the job needs no other tooling.
+      - name: Install throughline
+        run: pip install 'throughline>=3.11.0'
 
       # Composes the pinned `asvs` source into the union and validates the whole
       # graph. This fetches the source from its git origin, so the job needs network.
       - name: Composition gate (the composed graph must stay sound)
-        run: tl-compose check --strict
+        run: tl check --strict
 
       # The published document (docs/spec.md) and the README count badges must
       # still match this project's own graph.
       - name: Docs freshness gate
-        run: tl-compose docs --check
+        run: tl docs --check

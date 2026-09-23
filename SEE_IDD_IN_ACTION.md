@@ -12,28 +12,31 @@ Everything here is read-only — nothing you run changes the repo.
 ## Setup
 
 ```sh
-pip install "throughline-compose @ git+https://github.com/rhodium-org/throughline-compose@main"
+pip install 'throughline>=3.11.0'
 cd idd-example
 ```
 
-That installs two commands: `tl` (throughline core, one graph) and `tl-compose`
-(the composition superset). In this project you drive everything through
-`tl-compose`.
+That installs `tl`. From 3.11.0, `tl` composes the sources a project declares
+itself, so every command below answers over the union of this project and the
+standard it borrows.
 
-The first `tl-compose` command that composes the source fetches
+The first `tl` command that composes the source fetches
 [`throughline-asvs@v4.0.3`](https://github.com/rhodium-org/throughline-asvs) from its git
-origin into a per-user cache outside this repo; every run after that is offline.
+origin into a per-user cache outside this repo (`~/.cache/throughline/sources/`, or
+wherever `TL_CACHE` points). Later runs reuse the cache and refetch only if the
+pinned ref has moved; `TL_OFFLINE=1` composes from the cache alone.
 
 ---
 
 ## 1. Read the project the way an agent does
 
 ```sh
-tl-compose context
+tl context
 ```
 
 `context` prints an agent brief **generated from `throughline.toml`** — the item
-types, their attributes, the link rules, the grounding roots, and the non-goals. It
+types, their attributes, the link rules, the grounding roots, the composition the
+project declares, and the non-goals. It
 is the ground truth an AI agent should read before touching the graph: it describes
 exactly the rules the validator enforces, so an agent cannot invent a capability the
 tool does not have.
@@ -41,70 +44,87 @@ tool does not have.
 ## 2. Compose the standard and validate the union
 
 ```sh
-tl-compose check --strict
+tl check --strict
 ```
 
 ```
-tl-compose check · 1 source(s) composed: asvs (https://github.com/rhodium-org/throughline-asvs@v4.0.3)
+tl check · Council housing resident service (composed throughline example)
+  Items      298 live   system_requirement 281 · user_requirement 15 · intent 2
+  Status     approved 298
+  Links      299        implements 281 · derives_from 15 · satisfies 3
+  Grounding  4/4 local non-root items trace to a root · 1/1 local delivery roots served
+  Local      5 of 298 local   system_requirement 3 · intent 1 · user_requirement 1  ·  293 borrowed
+
+tl check · 1 source(s) composed: asvs (https://github.com/rhodium-org/throughline-asvs@v4.0.3) [7507659cb0df]
 
 0 error(s), 0 warning(s)  — composed graph is sound (strict)
 ```
 
-This is the heart of composition. `tl-compose` fetches the pinned `asvs` source,
+This is the heart of composition. `tl` fetches the pinned `asvs` source,
 merges it with this project's own items into **one in-memory graph**, and runs
 throughline's ordinary validator over the union. The council-housing requirements
 and the ASVS clauses they cite are checked together, as if they had always been one
 project. Exit code `0` means the whole thing is sound.
 
-## 3. Watch bare `tl` refuse to give a false clean result
+## 3. Tell what is yours from what is borrowed
 
 ```sh
-tl check
+tl ls --local
 ```
 
 ```
-[ERROR] SR-0001  namespace-unresolved 'asvs:SR-0003' is a namespace-qualified reference the core cannot resolve — run `tl-compose check` in a composed project
-[ERROR] SR-0002  namespace-unresolved 'asvs:SR-0004' ...
-[ERROR] SR-0003  namespace-unresolved 'asvs:SR-0006' ...
+INT-0001  [intent/approved]  Residents manage their council-housing account securely online
+SR-0001  [system_requirement/approved]  Enforce a minimum password length of 12 characters
+SR-0002  [system_requirement/approved]  Accept long passphrases without truncation
+SR-0003  [system_requirement/approved]  Reject credentials found in breach corpora
+UR-0001  [user_requirement/approved]  Residents authenticate securely
+
+5 item(s) (local only · 293 borrowed item(s) across 1 source(s) not searched — drop --local to search them)
 ```
 
-Run the **core** tool by habit in a composed repo and it stops the moment it meets a
-cross-source reference it cannot resolve, and points you at `tl-compose`. It never
-pretends the graph is clean when a reference is unresolved. (Free external references
-— a bare URL, a linked standard with no namespace — stay opaque and pass; only
-`namespace:UID` references trigger this.)
+Plain `tl ls` lists all 298 items of the composed graph; `--local` narrows it to the
+five this project owns. The union is what `check` validates; the local items are the
+ones this repository holds and edits.
+
+`tl` never pretends the graph is clean when it could not compose it. If the source
+cannot be fetched — say `TL_OFFLINE=1` on a machine whose cache has never seen
+`throughline-asvs@v4.0.3` — `check` stops with an error naming the source rather
+than validate the local half alone. A `tl` older than 3.11.0 cannot compose at all
+and reports each `asvs:` reference as `namespace-unresolved`. (Free external
+references — a bare URL, a linked standard with no namespace — stay opaque and pass;
+only `namespace:UID` references need the source.)
 
 ## 4. Trace a requirement up to its reason for existing
 
 ```sh
-tl-compose trace SR-0001
+tl trace SR-0001
 ```
 
 ```
 SR-0001  [system_requirement/approved] Enforce a minimum password length of 12 characters
 ├─(implements) UR-0001  [user_requirement/approved] Residents authenticate securely
-└─(derives_from) INT-0001  [intent/approved] Residents manage their council-housing account securely online
-└─(satisfies) asvs:SR-0003 (unresolved)
+│ └─(derives_from) INT-0001  [intent/approved] Residents manage their council-housing account securely online
+└─(satisfies) asvs:SR-0003  [system_requirement/approved] Minimum password length
 ```
 
 Every requirement can be walked back to the intent that justifies it — this is the
-"why" axis. Notice the last line: the `satisfies` link to the borrowed ASVS clause
-shows as `asvs:SR-0003 (unresolved)` because `trace` reads only the local graph. It
-tells you the product control cites an external standard clause, without pretending
-to own it.
+"why" axis. Notice the last line: the `satisfies` link resolves to the borrowed ASVS
+clause, with its own title and status, because `trace` answers over the composed
+union. The product control and the clause it cites sit in one tree, yet the clause
+keeps its namespace: this project cites it, and never owns or renumbers it.
 
 ## 5. Trace the other way — from intent down to delivery
 
 ```sh
-tl-compose trace INT-0001 --direction in
+tl trace INT-0001 --direction in
 ```
 
 ```
 INT-0001  [intent/approved] Residents manage their council-housing account securely online
 └─(derives_from) UR-0001  [user_requirement/approved] Residents authenticate securely
-├─(implements) SR-0001  ...
-├─(implements) SR-0002  ...
-└─(implements) SR-0003  ...
+  ├─(implements) SR-0001  [system_requirement/approved] Enforce a minimum password length of 12 characters
+  ├─(implements) SR-0002  [system_requirement/approved] Accept long passphrases without truncation
+  └─(implements) SR-0003  [system_requirement/approved] Reject credentials found in breach corpora
 ```
 
 Downward coverage: does everything the intent promises actually get delivered? A
@@ -114,7 +134,7 @@ tells you when a stated goal has no requirements under it.
 ## 6. Ask "what if I change this?" — the blast radius
 
 ```sh
-tl-compose blast UR-0001
+tl blast UR-0001
 ```
 
 ```
@@ -139,7 +159,7 @@ the gate that makes you look.
 ## 7. See the shape of the graph
 
 ```sh
-tl-compose shape
+tl shape
 ```
 
 ```
@@ -155,8 +175,8 @@ satisfy clauses of an external standard.
 ## 8. Publish a document and gate its freshness
 
 ```sh
-tl-compose docs          # regenerate docs/spec.md and the README badges from the graph
-tl-compose docs --check  # CI gate: fail if either is stale
+tl docs          # regenerate docs/spec.md and the README badges from the graph
+tl docs --check  # CI gate: fail if either is stale
 ```
 
 [`docs/spec.md`](docs/spec.md) and the count badges in the README are **generated
@@ -176,7 +196,7 @@ ref = "v4.0.3"     # ← change this to adopt a newer edition
 ```
 
 Adopting a new upstream edition is a one-line change to the pin. The borrowed graph
-is never edited in place; you move the `ref`, re-run `tl-compose check --strict`, and
+is never edited in place; you move the `ref`, re-run `tl check --strict`, and
 throughline tells you whether any clause you were relying on changed or disappeared.
 
 ---
@@ -190,9 +210,9 @@ catalogue in by reference, an agent has, in one graph, both **your requirements*
 makes several kinds of gap machine-findable rather than a matter of someone
 remembering.
 
-Point an agent at the repo and have it run `tl-compose context` first (so it knows
-the model and the non-goals), then reason over `tl-compose check --format json`,
-`tl-compose shape`, and the item files. Ask it for each of these:
+Point an agent at the repo and have it run `tl context` first (so it knows the
+model and the non-goals), then reason over `tl check --format json`, `tl shape`, and
+the item files. Ask it for each of these:
 
 **1. Standard controls you adopt but don't cover.** The `asvs` source contains every
 clause in the standard; your project cites only some of them with `satisfies` links.
@@ -205,7 +225,7 @@ citing V2.1.3 or V1.1.x — either add one, or add a `satisfies` link if an exis
 requirement already covers it."* A human then judges which it is — the tool proposes,
 the person decides.
 
-**2. Structural holes the validator already names.** `tl-compose check` reports
+**2. Structural holes the validator already names.** `tl check` reports
 `orphan` (an item that grounds to no root — scope with no justification),
 `unserved-root` (a goal or intent nobody delivers — a promise with no requirements),
 and `grounding-cycle` (circular justification). These are "missing link" gaps the
@@ -214,7 +234,7 @@ proposes the missing grounding.
 
 **3. Under-decomposed intent.** An intent or user requirement with few or no
 children is a "why" that has not yet been turned into "what". An agent can walk
-`tl-compose trace <root> --direction in`, find the thin branches, and draft candidate
+`tl trace <root> --direction in`, find the thin branches, and draft candidate
 user/system requirements that would flesh them out.
 
 **4. Coverage rules you assert but haven't met.** If the project declares a

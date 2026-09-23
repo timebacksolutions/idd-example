@@ -5,9 +5,9 @@ requirements are grounded locally and, where they restate a security control, li
 by `satisfies` to a clause borrowed from the `asvs` source
 ([`throughline-asvs@v4.0.3`](https://github.com/rhodium-org/throughline-asvs)).
 
-The item blocks below are **generated from the graph** by `tl-compose docs`; the
-section headings are the only hand-owned structure. Regenerate with `tl-compose docs`
-and gate freshness in CI with `tl-compose docs --check`.
+The item blocks below are **generated from the graph** by `tl docs`; the section
+headings are the only hand-owned structure. Regenerate with `tl docs` and gate
+freshness in CI with `tl docs --check`.
 
 ## Intent
 

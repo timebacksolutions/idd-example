@@ -4,6 +4,6 @@ __pycache__/
 venv/
 .DS_Store
 
-# A project-local source cache, if TL_COMPOSE_CACHE is pointed here. Resolved
+# A project-local source cache, if TL_CACHE is pointed here. Resolved
 # sources are derived, never committed.
-.tl-compose/
+.tl-cache/

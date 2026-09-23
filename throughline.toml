@@ -1,5 +1,5 @@
 [project]
-name = "Council housing resident service (throughline-compose example)"
+name = "Council housing resident service (composed throughline example)"
 format_version = 3
 
 # A worked example of a *composed* project. This is an ordinary throughline
@@ -8,13 +8,15 @@ format_version = 3
 # reference. The OWASP ASVS source is bound to the namespace `asvs` below, and
 # individual product requirements cite ASVS clauses as `asvs:SR-NNNN`.
 #
-# Drive this project with `tl-compose`, never bare `tl`: the composition-aware
-# `check` merges the sources into one union graph and validates it. Bare `tl`
-# fails fast the moment it meets a namespace-qualified reference it cannot resolve.
+# Drive this project with `tl` from throughline 3.11.0 or later, which composes
+# the declared sources itself: `check` merges them into one union graph and
+# validates it, and `trace`, `query`, `docs` and the other reads answer over the
+# same union. A `tl` older than 3.11.0 reports a namespace-qualified reference
+# as `namespace-unresolved`.
 
 # The source. The consumer picks the namespace (`import X as Y`); the source does
 # not name itself. A source is adopted by reference — a git `url` pinned to an
-# edition with `ref` — never vendored or copied. tl-compose fetches the pinned ref
+# edition with `ref` — never vendored or copied. `tl` fetches the pinned ref
 # into a per-user cache outside this project, so the consumer's own item scan never
 # sees it. To develop a source and its consumer side by side, a local `path` may be
 # used instead of `url` + `ref`.
@@ -85,8 +87,8 @@ verified    = ["implemented", "suspect", "deleted"]
 suspect     = ["approved", "ratified", "implemented", "verified", "rejected", "deleted"]
 rejected    = ["draft", "deleted"]
 
-# `tl-compose docs` regenerates docs/spec.md from this project's own graph and
-# `tl-compose docs --check` gates its freshness. Publishing activates the
+# `tl docs` regenerates docs/spec.md from this project's own graph and
+# `tl docs --check` gates its freshness. Publishing activates the
 # `unpublished` rule for this project's local items — every live normative local
 # item must be referenced by a published document. (Borrowed asvs clauses are not
 # this project's to publish; they are covered by the source's own docs.)
