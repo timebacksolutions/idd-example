@@ -1,10 +1,24 @@
 uid: UR-0001
 type: user_requirement
-status: approved
+status: ratified
 title: Residents authenticate securely
-text: A resident signs in with credentials that are held to the same strength,
-  length and breach-resistance controls a security assessor would expect, so that
-  an account cannot be trivially guessed or reused from a leaked password set.
+text: A resident signs in with credentials that are held to the same strength, length
+  and breach-resistance controls a security assessor would expect, so that an account
+  cannot be trivially guessed or reused from a leaked password set.
+normative: true
 links:
 - target: INT-0001
   type: derives_from
+attrs:
+  ratified_by: Henry Grech-Cini
+  ratified_id: github:rhodium289
+  ratified_fingerprint: sha256:1563c6dbb9740d93e83aff8a16a37cfc59c8c1a2de6a244d49fbe9f3e40ce5e5
+  ratified_content:
+    type: user_requirement
+    text: A resident signs in with credentials that are held to the same strength,
+      length and breach-resistance controls a security assessor would expect, so
+      that an account cannot be trivially guessed or reused from a leaked password
+      set.
+    normative: true
+    derived: false
+    attrs: {}

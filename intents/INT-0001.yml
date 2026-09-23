@@ -1,9 +1,22 @@
 uid: INT-0001
 type: intent
-status: approved
+status: ratified
 title: Residents manage their council-housing account securely online
 text: A resident of the council can view their tenancy, report repairs and update
-  their contact details through a self-service account, trusting that access to
-  that account is protected to a recognised security baseline rather than to
-  whatever the delivery team happened to think of.
+  their contact details through a self-service account, trusting that access to that
+  account is protected to a recognised security baseline rather than to whatever
+  the delivery team happened to think of.
 normative: false
+attrs:
+  ratified_by: Henry Grech-Cini
+  ratified_id: github:rhodium289
+  ratified_fingerprint: sha256:491e618ff90faf04d894a1ed3ed3fae7c1909edebbe0d35c43cc48e6a01fd919
+  ratified_content:
+    type: intent
+    text: A resident of the council can view their tenancy, report repairs and update
+      their contact details through a self-service account, trusting that access
+      to that account is protected to a recognised security baseline rather than
+      to whatever the delivery team happened to think of.
+    normative: false
+    derived: false
+    attrs: {}
