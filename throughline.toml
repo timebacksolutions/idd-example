@@ -1,6 +1,6 @@
 [project]
 name = "Council housing resident service (composed throughline example)"
-format_version = 3
+format_version = 4
 
 # A worked example of a *composed* project. This is an ordinary throughline
 # project — its own product requirements live under intents/, user-requirements/
